@@ -1,0 +1,731 @@
+/* ============================================================
+   advanced.css — styles for everything added in the upgrade
+   ------------------------------------------------------------
+   base.css   = reset + design tokens
+   style.css  = original layout & components
+   advanced.css (this file) = WebGL hero, custom cursor, radar,
+                certifications, lightbox, GitHub panel, skeletons
+   ============================================================ */
+
+/* ---------- 0. Nav breathing room (more links now) ---------- */
+.nav__links {
+  gap: clamp(var(--space-3), 1.6vw, var(--space-6));
+}
+.nav__links a {
+  font-size: var(--text-xs);
+}
+
+/* ---------- 1. WEBGL BACKDROP ---------- */
+#glCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* When WebGL runs, fade the 2D network canvas out instead of removing it. */
+.has-gl #gridCanvas {
+  opacity: 0.35;
+  transition: opacity 0.6s var(--ease);
+}
+
+/* ---------- 2. CUSTOM CURSOR ---------- */
+.cursor,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  border-radius: 50%;
+  /* pointer-events: none is what keeps clicks working normally. */
+  pointer-events: none;
+  will-change: transform;
+  margin-left: -3px;
+  margin-top: -3px;
+}
+.cursor {
+  width: 6px;
+  height: 6px;
+  background: var(--color-primary);
+  box-shadow: 0 0 12px var(--glow-1);
+}
+.cursor-ring {
+  width: 30px;
+  height: 30px;
+  margin-left: -15px;
+  margin-top: -15px;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 65%, transparent);
+  transition: width 0.22s var(--ease), height 0.22s var(--ease), margin 0.22s var(--ease),
+    background-color 0.22s var(--ease), opacity 0.22s var(--ease);
+}
+.cursor-ring.is-hot {
+  width: 48px;
+  height: 48px;
+  margin-left: -24px;
+  margin-top: -24px;
+  background: var(--color-primary-soft);
+}
+.cursor-ring.is-down {
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  margin-top: -10px;
+}
+.cursor-out .cursor,
+.cursor-out .cursor-ring {
+  opacity: 0;
+}
+/* Native cursor is never hidden — accessibility first. */
+
+/* ---------- 3. HERO TEXT + PARALLAX ---------- */
+.hero__title .scramble {
+  display: inline-block;
+}
+.hero__title .grad {
+  cursor: pointer;
+}
+.section__head {
+  transform: translateY(var(--par, 0px));
+  will-change: transform;
+}
+
+/* ---------- 4. IMAGE FALLBACKS (portrait / about photo) ---------- */
+[data-fallback].is-missing {
+  position: relative;
+  min-height: 320px;
+  background: radial-gradient(120% 90% at 20% 0%, color-mix(in srgb, var(--color-primary) 22%, transparent), transparent 60%),
+    repeating-linear-gradient(135deg, var(--color-surface-2) 0 14px, var(--color-surface-3) 14px 28px);
+  display: grid;
+  place-items: center;
+}
+[data-fallback].is-missing::before {
+  content: attr(data-fallback);
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  letter-spacing: -0.04em;
+  color: color-mix(in srgb, var(--color-primary) 80%, var(--color-text));
+  opacity: 0.85;
+}
+[data-fallback].is-missing::after {
+  content: 'add ' attr(data-fallback-label);
+  position: absolute;
+  /* Sits just under the monogram rather than at the very bottom, where the
+     floating "DUET Karachi" badge would overlap it. */
+  top: 58%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text-faint);
+}
+.about__photo.is-missing {
+  min-height: 260px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* ---------- 5. SKILLS RADAR ---------- */
+.radar {
+  margin-top: var(--space-8);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+}
+.radar__cap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--space-2);
+}
+.radar__eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+.radar__hint {
+  font-size: 0.72rem;
+  color: var(--color-text-faint);
+}
+.radar__stage {
+  position: relative;
+}
+#radarCanvas {
+  width: 100%;
+  height: 340px;
+  display: block;
+}
+.radar__tip {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  padding: 0.3rem 0.55rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-3);
+  border: 1px solid var(--color-border-strong);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------- 6. CERTIFICATION CARDS ---------- */
+.certgrid {
+  display: grid;
+  gap: var(--space-4);
+  position: relative;
+}
+.cert-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  overflow: hidden;
+  transition: transform 0.35s var(--ease), border-color 0.35s var(--ease), box-shadow 0.35s var(--ease);
+}
+.cert-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+}
+.cert-card__thumb {
+  display: block;
+  width: 100%;
+  padding: 0;
+  aspect-ratio: 400 / 200;
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+}
+.cert-card__thumb svg,
+.cert-card__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.cert-card__body {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+}
+.cert-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.cert-card__issuer {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-cyan);
+}
+.cert-card__status {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  border: 1px dashed var(--color-border-strong);
+  color: var(--color-text-faint);
+  white-space: nowrap;
+}
+.cert-card[data-status='verified'] .cert-card__status {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--color-primary) 50%, transparent);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+.cert-card[data-status='in-progress'] .cert-card__status {
+  border-color: color-mix(in srgb, var(--color-cyan) 45%, transparent);
+  color: var(--color-cyan);
+}
+.cert-card__title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  letter-spacing: -0.02em;
+}
+.cert-card__meta {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.cert-card__id {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--color-text-faint);
+  word-break: break-word;
+}
+.cert-card__chips {
+  margin-top: auto;
+}
+.cert-card__link {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-primary);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-3);
+}
+.cert-card__link:hover {
+  text-decoration: underline;
+}
+.cert-card__link.is-off {
+  color: var(--color-text-faint);
+}
+.cert-card__hint {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--color-text-faint);
+  margin-top: var(--space-2);
+}
+.cert-card__hint code {
+  color: var(--color-primary);
+}
+
+/* ---------- 7. LIGHTBOX ---------- */
+.lightbox {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  max-width: min(920px, 94vw);
+  width: 100%;
+  color: var(--color-text);
+}
+.lightbox::backdrop {
+  background: rgb(2 6 9 / 0.82);
+  backdrop-filter: blur(4px);
+}
+.lightbox__inner {
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+.lightbox__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+.lightbox__titles {
+  display: grid;
+  min-width: 0;
+}
+.lightbox__titles strong {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  letter-spacing: -0.02em;
+}
+.lightbox__titles span {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+.lightbox__nav {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+.lightbox__btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  display: grid;
+  place-items: center;
+  font-size: 0.85rem;
+}
+.lightbox__btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.lightbox__stage {
+  background: var(--color-bg-2);
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  max-height: 62vh;
+}
+.lightbox__stage img,
+.lightbox__badge svg {
+  width: 100%;
+  max-height: 56vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+.lightbox__foot {
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+}
+.lightbox__id {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+.lightbox__foot a {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-primary);
+}
+.lightbox__foot .cert-card__hint {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+/* ---------- 8. GITHUB PANEL ---------- */
+.gh {
+  display: grid;
+  gap: var(--space-4);
+}
+.gh__profile {
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+.gh__avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-strong);
+  object-fit: cover;
+}
+.gh__avatar--gen {
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+.gh__login {
+  font-family: var(--font-mono);
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+}
+.gh__bio {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+.gh__stats {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+.gh__stats dt {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.gh__stats dd {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--color-text);
+}
+.gh__badge {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+.gh__side {
+  display: grid;
+  gap: var(--space-4);
+}
+.gh__panel {
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+}
+.gh__panel-title {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+.langbar {
+  display: flex;
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--color-surface-3);
+}
+.langbar span {
+  height: 100%;
+}
+.langlegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin-top: var(--space-4);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+.langlegend li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.langlegend b {
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+.lang-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  flex: none;
+}
+.heat {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 1fr);
+  grid-auto-columns: 1fr;
+  gap: 3px;
+}
+.heat__cell {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: var(--color-surface-3);
+}
+.heat__cell[data-level='1'] {
+  background: color-mix(in srgb, var(--color-primary) 28%, var(--color-surface-3));
+}
+.heat__cell[data-level='2'] {
+  background: color-mix(in srgb, var(--color-primary) 52%, var(--color-surface-3));
+}
+.heat__cell[data-level='3'] {
+  background: color-mix(in srgb, var(--color-primary) 76%, var(--color-surface-3));
+}
+.heat__cell[data-level='4'] {
+  background: var(--color-primary);
+}
+.heat__meta,
+.gh__legend {
+  margin-top: var(--space-3);
+  font-size: 0.72rem;
+  color: var(--color-text-faint);
+}
+.gh__legend code {
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+}
+.gh__repos-title {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: var(--space-10) 0 var(--space-4);
+}
+.gh__repos {
+  display: grid;
+  gap: var(--space-3);
+  position: relative;
+}
+.ghrepo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  transition: border-color 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.ghrepo:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+.ghrepo__name {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  word-break: break-word;
+}
+.ghrepo__desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  /* Some repo descriptions are whole paragraphs — clamp to 3 lines so
+     every card in the grid stays roughly the same height. */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ghrepo__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--color-text-faint);
+}
+.ghrepo__foot span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.gh__note {
+  margin-top: var(--space-4);
+  font-size: 0.72rem;
+  color: var(--color-text-faint);
+  font-family: var(--font-mono);
+}
+.pcard__live.is-live {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-text-muted);
+}
+
+/* ---------- 9. SKELETON LOADERS ---------- */
+.sk {
+  background: linear-gradient(90deg, var(--color-surface-2) 25%, var(--color-surface-3) 37%, var(--color-surface-2) 63%);
+  background-size: 400% 100%;
+  border-radius: var(--radius-sm);
+  animation: sk-shine 1.4s ease-in-out infinite;
+}
+.sk--avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+}
+.sk--line {
+  height: 12px;
+  margin-top: var(--space-3);
+}
+.sk--bar {
+  height: 12px;
+  border-radius: 999px;
+}
+.sk--heat {
+  height: 110px;
+}
+.sk--card {
+  height: 92px;
+}
+@keyframes sk-shine {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+/* ---------- 10. SPOTLIGHT over card grids ---------- */
+.has-spot::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--space-4) * -1);
+  border-radius: var(--radius-lg);
+  background: radial-gradient(320px circle at var(--sx, 50%) var(--sy, 50%), var(--glow-1), transparent 70%);
+  opacity: var(--so, 0);
+  transition: opacity 0.35s var(--ease);
+  pointer-events: none;
+  z-index: 0;
+}
+.has-spot > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- 11. TERMINAL EXTRAS ---------- */
+.console__screen {
+  position: relative;
+}
+.matrix {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.9;
+}
+.section__sub kbd {
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--color-border-strong);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  color: var(--color-text);
+}
+
+/* ---------- 12. RESPONSIVE ---------- */
+@media (min-width: 640px) {
+  .certgrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .gh__repos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .certgrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .gh {
+    grid-template-columns: 0.85fr 1.15fr;
+    align-items: start;
+  }
+  .gh__repos {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  #radarCanvas {
+    height: 380px;
+  }
+}
+
+/* ---------- 13. REDUCED MOTION ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .sk {
+    animation: none;
+  }
+  .section__head {
+    transform: none;
+  }
+  .cursor,
+  .cursor-ring {
+    display: none;
+  }
+}
